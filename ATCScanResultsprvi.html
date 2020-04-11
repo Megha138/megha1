@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.widget {
+	background-color: #FDFDFD ;
+}
+
+.title {
+	font-weight: bold !important;
+}
+</style>
+<script src="sdk/scripts/VSS.SDK.min.js"></script>
+<script type="text/javascript">
+    VSS.init({
+      explicitNotifyLoaded: true,
+      usePlatformStyles: true
+    });
+
+    VSS.require("TFS/Dashboards/WidgetHelpers", function (WidgetHelpers) {
+			WidgetHelpers.IncludeWidgetStyles();
+			VSS.register("ATCScanResultsWidget", function () {
+
+				var getQueryInfo = function (widgetSettings) {
+						console.log("Inside get QueryInfo...");
+						var settings = JSON.parse(widgetSettings.customSettings.data);
+						
+						// Get Latest Build Number
+						var xhr = new XMLHttpRequest();
+						var latestBuildURL = "https://dev.azure.com/meghakadur0235/Clairtool/_apis/build/latest/14?api-version=5.1-preview.1";
+						//"https://dev.azure.com/meghakadur0235/Clairtool/_apis/build/latest/12?api-version=5.1-preview.1";
+						xhr.open("GET", latestBuildURL, true);
+						console.log("REST API URL set...");
+			
+						xhr.setRequestHeader("Authorization", "Basic " + btoa("meghakadur0235"+":"+"a2yoptravq4gs35yc4ylibb2skavmxt3fb5eqfxexqnnycmoqtia"));
+						
+						var latestBuildNumber = "";
+						var buildDefName = "";
+						var Reponame = "Clairtool1";
+						var Branchname = "Master";
+						xhr.onreadystatechange = function() {
+							if (this.readyState == 4 && this.status == 200) {
+								console.log(this.responseText);
+								var jsonResponse = JSON.parse(this.responseText);
+								console.log("response  "+jsonResponse);
+								
+								latestBuildNumber = jsonResponse.buildNumber;
+								console.log("latestBuildNumber: "+latestBuildNumber);
+								
+								//buildDefName = jsonResponse.definition.name;
+								//console.log("buildDefName: "+buildDefName);
+								
+								// Second call
+								var xhr2 = new XMLHttpRequest();
+								console.log("XMLHttpRequest object created...");
+								
+								var logsURL = "https://dev.azure.com/meghakadur0235/Clairtool/_apis/build/builds/"+ latestBuildNumber +"/logs/6?startLine=23&endLine=28&api-version=5.1"
+								//console.log("logsURL: "+logsURL);
+								xhr2.open("GET", logsURL, true);
+								console.log("REST API URL set...");
+								
+								xhr2.setRequestHeader("Authorization", "Basic " + btoa("meghakadur0235"+":"+"a2yoptravq4gs35yc4ylibb2skavmxt3fb5eqfxexqnnycmoqtia"));
+								console.log("REST API invoked...");
+								
+								xhr2.onreadystatechange = function() {
+									if (this.readyState == 4 && this.status == 200) {
+										//console.log(this.responseText);
+										var finalop = "";
+										 // By lines
+										var lines = this.responseText.split('\n');
+										console.log("No. of lines: "+lines.length);
+										//console.log("lines" +lines);
+										// Display first 17 lines
+										for(var i = 0; i<6 ; i++) {
+										//finalop = finalop + "<br>" + lines[i]; this code is actually printing the output
+										finalop = "<table ><tr><th ><span style='font-weight:bold;'>Date</span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</th>"
+										finalop+="<th style=\"max-width: 100px; color: red;\"><span style='font-weight:bold;'>Vulnaribility</span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</th><th><span style='font-weight:bold;'>Value</span></th></tr>";
+										 }
+										 //var status = lines[0];
+										//if(status.indexOf("[error]") > -1) {
+											//finalop = finalop + "<br>" + "<span style='color:black;font-weight:bold;'>" + status + "</span>"; // Display text in red in case of error
+										//} else {
+											//finalop = finalop + "<br>" + "<span style='color:black;font-weight:bold;'>" + status + "</span>"; // Otherwise in green
+											//}
+										
+										 //var status = lines[1];
+										//if(status.indexOf("[error]") > -1) {
+											//finalop = finalop + "<br>" + "<span style='color:black;font-weight:bold;'>" + status + "</span>"; // Display text in red in case of error
+										//} else {
+											//finalop = finalop + "<br>" + "<span style='color:black;font-weight:bold;'>" + status + "</span>"; // Otherwise in green
+											//}
+										 
+										 var status = lines[2];
+										 var res3 = status.slice(0, 10);
+										 var res2 = status.slice(28, 36);
+										 var res6 = status.slice(38, 43);
+										if(status.indexOf("[error]") > -1) {
+											finalop = finalop +"<br>"+"<tr><td style=\"width: 100px; color: red;\">"+res3+"</td><td>"+res2+"</td><td>"+res6+"</td></tr>"; // Display text in red in case of error
+										} else {
+											finalop =finalop +"<br>"+"<tr><td style=\"width: 100px; color: red;\">"+res3+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</td><td><span style='color:blue;font-weight:bold;'>"+res2+"</span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</td><td><span style='color:blue;font-weight:bold;'>"+res6+"</span></td></tr>"; //Display text in red in case of error
+											}
+										
+										var status = lines[3];
+										var res4 = status.slice(0, 10);
+										 var res5 = status.slice(28, 39);
+										 var res7 = status.slice(40, 42);
+										if(status.indexOf("[error]") > -1) {
+											finalop = finalop +"<br>"+"<tr><td style=\"width: 100px; color: red;\">"+res4+"</td><td>"+res5+"</td><td>"+res7+"</td></tr>"; //Display text in red in case of error
+										} else {
+											finalop = finalop +"<br>"+"<tr><td style=\"width: 100px; color: red;\">"+res4+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</td><td><span style='color:green;font-weight:bold;'>"+res5+"</span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</td><td><span style='color:green;font-weight:bold;'>"+res7+"</span></td></tr>"; //Display text in red in case of error
+											}
+											
+										var status = lines[4];
+										var res8 = status.slice(0, 10);
+										 var res9 = status.slice(28, 32);
+										 var res10 = status.slice(34, 36);
+										if(status.indexOf("[error]") > -1) {
+											finalop = finalop +"<br>"+"<tr><td style=\"width: 100px; color: red;\">"+res8+"</td><td>"+res9+"</td><td>"+res10+"</td></tr>"; //Display text in red in case of error
+										} else {
+											finalop = finalop +"<br>"+"<tr><td style=\"width: 100px; color: red;\">"+res8+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</td><td><span style='color:purple;font-weight:bold;'>"+res9+"</span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</td><td><span style='color:purple;font-weight:bold;'>"+res10+"</span></td></tr>"; //Display text in red in case of error
+											}
+											
+									    var status = lines[5];
+										var res11 = status.slice(0, 10);
+										 var res12 = status.slice(28, 33);
+										 var res13 = status.slice(34, 36);
+										if(status.indexOf("[error]") > -1) {
+											finalop = finalop +"<br>"+"<tr><td style=\"width: 100px; color: red;\">"+res11+"</td><td>"+res12+"</td><td>"+res13+"</td></tr>"; //Display text in red in case of error
+										} else {
+											finalop = finalop +"<br>"+"<tr><td style=\"width: 100px; color: red;\">"+res11+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</td><td><span style='color:red;font-weight:bold;'>"+res12+"</span>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp;</td><td><span style='color:red;font-weight:bold;'>"+res13+"</span></td></tr>"; //Display text in red in case of error
+											}
+											
+									     document.getElementById("query-info-container").innerHTML = "<br><span style='font-weight:bold;'>Build No.: "+ latestBuildNumber +"</span><br>" 
+																								  +"<br><span style='font-weight:bold;'>Reponame: "+ Reponame +"</span><br>"+"<br><span style='font-weight:bold;'>Branchname: "+ Branchname +"</span><br>"
+																								  + finalop;
+										
+									}
+								};	
+								xhr2.send();
+							}
+						};
+						xhr.send();
+
+						return WidgetHelpers.WidgetStatusHelper.Success();
+				}
+
+				return {
+					load: function (widgetSettings) {
+						var $title = $('h2.title');
+						console.log("Load");
+						$title.text(widgetSettings.name);
+						return getQueryInfo(widgetSettings);
+					}
+				}
+			});
+
+			VSS.notifyLoadSucceeded();
+		});
+</script>
+</head>
+<body>
+	<div class="widget">
+		<h2 class="title"><b></b></h2>
+		<div id="query-info-container"></div>
+	</div>
+</body>
+</html>
