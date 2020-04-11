@@ -1,0 +1,52 @@
+{
+        "manifestVersion": 1,
+        "id": "vsts-extensions-myExtensions-for-privateimages",
+        "version": "1.0.0",
+        "name": "CLAIR-For P Vulnerabilities scanning of Docker Images",
+        "description": "Displays Vulnerabilites scanning of Private  Docker Image",
+        "publisher": "megha123",
+        "categories": ["Azure Boards"],
+        "targets": [
+            {
+                "id": "Microsoft.VisualStudio.Services"
+            }
+        ],
+        "icons": {
+            "default": "img/clairmage1.png"
+        },
+        "contributions": [
+            {
+                "id": "ATCScanResultsWidget",
+                "type": "ms.vss-dashboards-web.widget",
+                "targets": [
+                    "ms.vss-dashboards-web.widget-catalog"
+                ],
+                "properties": { 
+                    "name": "Clair tool integration with Azure DevOps for private images",
+                    "description": "Displays Scan results for clair tool from latest build ",
+                    "catalogIconUrl": "img/clairmage1.png",
+                    "previewImageUrl": "img/clairmage1.png",
+                    "uri": "ATCScanResultsprvi.html",
+                    "supportedSizes": [
+                         {
+                                "rowSpan": 3,
+                                "columnSpan": 3
+                            }
+                        ],
+                    "supportedScopes": ["project_team"]
+                }
+            }
+        ],
+        "files": [
+            {
+                "path": "ATCScanResultsprvi.html", "addressable": true
+            },
+            {
+                "path": "sdk/scripts", "addressable": true
+            },
+            {
+                "path": "img", "addressable": true
+            }
+        ],
+		"scopes":["vso.work"]
+    }
